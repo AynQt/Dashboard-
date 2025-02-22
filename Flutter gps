@@ -1,0 +1,135 @@
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Real-Time GPS Tracker',
+      theme: ThemeData(primarySwatch: Colors.teal),
+      home: GPSPage(),
+    );
+  }
+}
+
+class GPSPage extends StatefulWidget {
+  @override
+  _GPSPageState createState() => _GPSPageState();
+}
+
+class _GPSPageState extends State<GPSPage> {
+  Position? _currentPosition;
+  String _locationMessage = "Fetching location...";
+  String _address = "Fetching address...";
+  final FlutterTts flutterTts = FlutterTts();
+
+  @override
+  void initState() {
+    super.initState();
+    _initializePermissions();
+  }
+
+  Future<void> _initializePermissions() async {
+    if (await Permission.location.request().isGranted) {
+      _getCurrentLocation();
+    } else {
+      setState(() {
+        _locationMessage = "Location permission denied. Enable it from settings.";
+      });
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      setState(() {
+        _locationMessage = 'Location services are disabled.';
+      });
+      return;
+    }
+
+    Geolocator.getPositionStream(
+      locationSettings: LocationSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 10,
+      ),
+    ).listen((Position position) {
+      setState(() {
+        _currentPosition = position;
+        _locationMessage =
+        "Lat: ${position.latitude}, Lon: ${position.longitude}";
+      });
+      _getAddressFromLatLng(position);
+    });
+  }
+
+  Future<void> _getAddressFromLatLng(Position position) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude, position.longitude);
+      Placemark place = placemarks[0];
+      String address =
+          "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      setState(() {
+        _address = address;
+      });
+      _speakAddress(address);
+    } catch (e) {
+      setState(() {
+        _address = "Failed to get address.";
+      });
+    }
+  }
+
+  Future<void> _speakAddress(String address) async {
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setPitch(1);
+    await flutterTts.speak("You are currently at $address");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Real-Time GPS Tracker")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.location_on, size: 100, color: Colors.teal),
+            SizedBox(height: 20),
+            Text(
+              _locationMessage,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 10),
+            Text(
+              _address,
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 30),
+            ElevatedButton.icon(
+              onPressed: _getCurrentLocation,
+              icon: Icon(Icons.my_location),
+              label: Text("Refresh Location"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
