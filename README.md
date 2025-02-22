@@ -1,2 +1,2 @@
-# Dashboard-
-The College Club Management Dashboard is a comprehensive web platform designed to streamline the event approval process for college clubs. It simplifies the workflow for club presidents to request and manage event permissions by providing a centralized system that connects mentors and the Dean Academics.
+# Voice assisted Navigation app-
+This project aims to develop a voice-controlled object detection system designed to assist visually impaired individuals in navigating their environment safely and independently. The system uses a webcam and the YOLOv8 object detection model to recognize surrounding objects in real-time. It provides audio feedback about the detected objects, including their approximate distance, allowing users to understand their surroundings better without relying on sight.
