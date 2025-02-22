@@ -1,2 +1,16 @@
-# Voice assisted Navigation app-
-This project aims to develop a voice-controlled object detection system designed to assist visually impaired individuals in navigating their environment safely and independently. The system uses a webcam and the YOLOv8 object detection model to recognize surrounding objects in real-time. It provides audio feedback about the detected objects, including their approximate distance, allowing users to understand their surroundings better without relying on sight.
+# blind
+
+A new Flutter project.
+
+## Getting Started
+
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
